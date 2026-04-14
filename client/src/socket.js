@@ -6,7 +6,6 @@ export const socketInit = () => {
         'force new connection': true,
         reconnectionAttempt: 'Infinity',
         timeout: 10000,
-        transports: ['websocket'],
     };
-    return io('http://localhost:5000', options);
+    return io('http://127.0.0.1:5000', options);
 };

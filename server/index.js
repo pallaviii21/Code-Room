@@ -3,9 +3,87 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
+const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const connectDB = require('./config/db');
+const Room = require('./models/Room');
+const CodeSnapshot = require('./models/CodeSnapshot');
+
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 app.use(cors());
+app.use(express.json());
+
+app.post('/api/execute', (req, res) => {
+    const { language, files } = req.body;
+    let sourceCode = files && files.length > 0 ? files[0].content : '';
+    
+    const tempDir = path.join(__dirname, 'temp_exe');
+    if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
+    }
+    
+    const fileId = "test_run_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    
+    let ext = '';
+    let runCommand = '';
+    
+    if (language === 'javascript') {
+        ext = '.js';
+        runCommand = `node ${fileId}${ext}`;
+    } else if (language === 'python') {
+        ext = '.py';
+        runCommand = `python ${fileId}${ext}`;
+    } else if (language === 'cpp') {
+        ext = '.cpp';
+        runCommand = `g++ ${fileId}${ext} -o ${fileId}.exe && ${fileId}.exe`;
+    } else if (language === 'java') {
+        ext = '.java';
+        runCommand = `javac Main.java && java Main`;
+    } else {
+        return res.status(400).json({ message: `Local execution for ${language} is not supported locally.` });
+    }
+    
+    let targetFileName = fileId + ext;
+    let cwd = tempDir;
+    
+    if (language === 'java') {
+        cwd = path.join(tempDir, fileId);
+        fs.mkdirSync(cwd);
+        targetFileName = 'Main.java';
+    }
+    
+    const filePath = path.join(cwd, targetFileName);
+    fs.writeFileSync(filePath, sourceCode);
+    
+    exec(runCommand, { cwd, timeout: 10000 }, (error, stdout, stderr) => {
+        if (language === 'java') {
+            fs.rmSync(cwd, { recursive: true, force: true });
+        } else {
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            if (language === 'cpp' && fs.existsSync(path.join(cwd, `${fileId}.exe`))) {
+                fs.unlinkSync(path.join(cwd, `${fileId}.exe`));
+            }
+        }
+        
+        let output = stdout || stderr || '';
+        if (error && !stderr) {
+            output = error.message;
+        }
+        
+        res.json({
+            run: {
+                stdout: stdout || '',
+                stderr: stderr || '',
+                output: output,
+                code: error ? (error.code || 1) : 0
+            }
+        });
+    });
+});
 
 const server = http.createServer(app);
 
@@ -33,11 +111,18 @@ io.on('connection', (socket) => {
     console.log(`User connected: ${socket.id}`);
 
     // Listen for join_room
-    socket.on('join_room', ({ roomId, username }) => {
+    socket.on('join_room', async ({ roomId, username }) => {
         userSocketMap.set(socket.id, { username, roomId });
         socket.join(roomId);
         console.log(`User ${username} (${socket.id}) joined room ${roomId}`);
         
+        // Ensure Room exists in DB
+        try {
+            await Room.updateOne({ roomId }, { $setOnInsert: { roomId } }, { upsert: true });
+        } catch (err) {
+            console.error('Error creating room in DB', err);
+        }
+
         const clients = getAllConnectedClients(roomId);
         
         // Notify others that a user joined
@@ -45,18 +130,39 @@ io.on('connection', (socket) => {
         // Send updated user list to everyone in the room
         io.to(roomId).emit('user_list', { clients });
 
-        // If there's already code in this room, send to the user immediately
-        if (roomState.has(roomId)) {
-            socket.emit('code_change', { code: roomState.get(roomId).code });
+        // Load code from Database or Memory
+        try {
+            const snapshot = await CodeSnapshot.findOne({ roomId });
+            if (snapshot) {
+                // Pre-fill memory state
+                roomState.set(roomId, { code: snapshot.code });
+                socket.emit('code_change', { code: snapshot.code });
+            } else if (roomState.has(roomId)) {
+                // Fallback to memory if DB doesn't have it but memory does
+                socket.emit('code_change', { code: roomState.get(roomId).code });
+            }
+        } catch (err) {
+            console.error('Error fetching snapshot', err);
         }
     });
 
     // Listen for code changes
-    socket.on('code_change', ({ roomId, code }) => {
-        // Save the latest code
+    socket.on('code_change', async ({ roomId, code }) => {
+        // Save the latest code in memory
         roomState.set(roomId, { code });
         // Broadcast to all other clients in the exact room
         socket.to(roomId).emit('code_change', { code });
+
+        // Update Database asynchronously
+        try {
+            await CodeSnapshot.updateOne(
+                { roomId },
+                { code, updatedAt: Date.now() },
+                { upsert: true }
+            );
+        } catch (err) {
+            console.error('Error updating code snapshot in DB', err);
+        }
     });
 
     socket.on('disconnecting', () => {

@@ -20,14 +20,13 @@ export const executeCode = async (language, sourceCode) => {
     }
 
     try {
-        const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+        const response = await fetch("http://127.0.0.1:5000/api/execute", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 language: runConfig.language,
-                version: "*", // Use highest available version on the Piston v2 engine
                 files: [
                     {
                         content: sourceCode
