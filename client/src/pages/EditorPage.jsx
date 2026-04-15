@@ -16,6 +16,11 @@ const EditorPage = () => {
     const [language, setLanguage] = useState('javascript');
     const [output, setOutput] = useState(null);
     const [isExecuting, setIsExecuting] = useState(false);
+    
+    // Chat state
+    const [messages, setMessages] = useState([]);
+    const [currentMessage, setCurrentMessage] = useState('');
+    const chatContainerRef = useRef(null);
 
     useEffect(() => {
         const init = async () => {
@@ -56,6 +61,10 @@ const EditorPage = () => {
             socketRef.current.on('user_list', ({ clients }) => {
                 setClients(clients);
             });
+
+            socketRef.current.on('receive_message', (messageData) => {
+                setMessages((prev) => [...prev, messageData]);
+            });
         };
         init();
 
@@ -66,9 +75,17 @@ const EditorPage = () => {
                 socketRef.current.off('user_joined');
                 socketRef.current.off('user_left');
                 socketRef.current.off('user_list');
+                socketRef.current.off('receive_message');
             }
         };
     }, []);
+
+    // Auto-scroll chat to bottom
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const handleEditorChange = (value, event) => {
         setCode(value);
@@ -81,6 +98,18 @@ const EditorPage = () => {
             roomId,
             code: value,
         });
+    };
+
+    const handleSendMessage = () => {
+        if (!currentMessage.trim() || !socketRef.current) return;
+        
+        socketRef.current.emit('send_message', {
+            roomId,
+            message: currentMessage.trim(),
+            username: location.state?.username,
+        });
+        
+        setCurrentMessage('');
     };
 
     const handleRunCode = async () => {
@@ -138,18 +167,65 @@ const EditorPage = () => {
                 {/* Sidebar */}
                 <div className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0 z-10 shadow-lg">
                     <div className="p-4 flex-1 overflow-hidden flex flex-col">
-                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-700 pb-2">Connected Users</h3>
-                        <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
-                            {clients.map((client) => (
-                                <div key={client.socketId} className="flex items-center space-x-3 bg-slate-700/50 p-2 rounded-lg hover:bg-slate-700 transition duration-200">
-                                    <div className="w-9 h-9 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-white uppercase select-none shadow-md">
-                                        {client.username.substring(0, 2)}
+                        {/* Users Section */}
+                        <div className="flex flex-col h-1/3 min-h-0 border-b border-slate-700 pb-4 mb-4">
+                            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Connected Users</h3>
+                            <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
+                                {clients.map((client) => (
+                                    <div key={client.socketId} className="flex items-center space-x-3 bg-slate-700/50 p-2 rounded-lg hover:bg-slate-700 transition duration-200">
+                                        <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-white text-xs uppercase select-none shadow-md">
+                                            {client.username.substring(0, 2)}
+                                        </div>
+                                        <span className="text-sm font-medium text-slate-200 truncate pr-2">
+                                            {client.username} {client.username === location.state?.username && <span className="text-slate-400 font-normal italic">(You)</span>}
+                                        </span>
                                     </div>
-                                    <span className="text-sm font-medium text-slate-200 truncate pr-2">
-                                        {client.username} {client.username === location.state?.username && <span className="text-slate-400 font-normal italic">(You)</span>}
-                                    </span>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Chat Section */}
+                        <div className="flex flex-col flex-1 min-h-0 relative">
+                            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                                <span>Room Chat</span>
+                            </h3>
+                            <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-1 rounded-lg mb-3" ref={chatContainerRef}>
+                                {messages.length === 0 ? (
+                                    <div className="text-xs text-slate-500 italic text-center mt-4">No messages yet. Say hello!</div>
+                                ) : (
+                                    messages.map((msg, idx) => (
+                                        <div key={idx} className={`flex flex-col ${msg.socketId === socketRef.current?.id ? 'items-end' : 'items-start'}`}>
+                                            <div className="flex items-baseline space-x-2">
+                                                <span className="text-[10px] font-semibold text-slate-400">{msg.username}</span>
+                                                <span className="text-[9px] text-slate-500">{msg.timestamp}</span>
+                                            </div>
+                                            <div className={`mt-0.5 py-1.5 px-3 rounded-lg text-sm max-w-[90%] break-words shadow-sm ${msg.socketId === socketRef.current?.id ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-700 text-slate-200 rounded-bl-none'}`}>
+                                                {msg.message}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className="relative mt-auto flex-shrink-0">
+                                <input 
+                                    type="text" 
+                                    value={currentMessage}
+                                    onChange={(e) => setCurrentMessage(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                    placeholder="Type a message..."
+                                    className="w-full bg-slate-900 text-sm text-slate-200 rounded-lg pl-3 pr-10 py-2 outline-none border border-slate-600 focus:border-indigo-500 transition-colors shadow-inner"
+                                />
+                                <button 
+                                    onClick={handleSendMessage}
+                                    disabled={!currentMessage.trim()}
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-indigo-500 hover:text-indigo-400 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors"
+                                    title="Send"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     

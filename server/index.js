@@ -165,6 +165,18 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Listen for chat messages
+    socket.on('send_message', ({ roomId, message, username }) => {
+        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        // Broadcast the message to all clients in the room (including sender if we want, or use io.to to include everyone)
+        io.to(roomId).emit('receive_message', { 
+            message, 
+            username, 
+            timestamp,
+            socketId: socket.id
+        });
+    });
+
     socket.on('disconnecting', () => {
         const rooms = [...socket.rooms];
         const user = userSocketMap.get(socket.id);
