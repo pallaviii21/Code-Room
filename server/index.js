@@ -14,7 +14,11 @@ const CodeSnapshot = require('./models/CodeSnapshot');
 connectDB();
 
 const app = express();
-app.use(cors());
+const allowedOrigin = process.env.FRONTEND_URL || '*';
+app.use(cors({
+    origin: allowedOrigin,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 app.use(express.json());
 
 app.post('/api/execute', (req, res) => {
@@ -89,7 +93,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: '*', // Allows all origins for local phase 1 development
+        origin: process.env.FRONTEND_URL || '*',
         methods: ['GET', 'POST']
     }
 });
