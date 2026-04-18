@@ -7,6 +7,6 @@ export const socketInit = () => {
         reconnectionAttempt: 'Infinity',
         timeout: 10000,
     };
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:5000';
+    const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:5000').replace(/\/$/, '');
     return io(BACKEND_URL, options);
 };

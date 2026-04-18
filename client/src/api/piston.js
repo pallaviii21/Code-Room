@@ -20,7 +20,7 @@ export const executeCode = async (language, sourceCode) => {
     }
 
     try {
-        const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5000";
+        const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5000").replace(/\/$/, '');
         const response = await fetch(`${BACKEND_URL}/api/execute`, {
             method: "POST",
             headers: {
