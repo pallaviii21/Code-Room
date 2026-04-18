@@ -153,7 +153,10 @@ const EditorPage = () => {
         <div className="flex h-screen bg-slate-900 text-slate-100 flex-col">
             <div className="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6">
                 <div className="flex items-center space-x-4">
-                    <h1 className="text-xl font-bold text-white">Code Room</h1>
+                    <div className="flex items-center space-x-2">
+                        <img className="h-8 w-auto drop-shadow-sm" src="/codeRoom-Photoroom.png" alt="Code Room Logo" />
+                        <h1 className="text-xl font-bold text-white">Code Room</h1>
+                    </div>
                     <span className="px-3 py-1 bg-slate-700 rounded-full text-xs font-semibold text-slate-300">
                         Room: {roomId}
                     </span>

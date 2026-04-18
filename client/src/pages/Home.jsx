@@ -35,7 +35,8 @@ const Home = () => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-slate-900 text-slate-100">
             <div className="w-full max-w-md p-8 space-y-6 bg-slate-800/50 backdrop-blur-md rounded-2xl shadow-xl border border-slate-700/50">
-                <div className="text-center space-y-2">
+                <div className="text-center space-y-2 flex flex-col items-center">
+                    <img className="h-24 w-auto mb-2 drop-shadow-md" src="/codeRoom-Photoroom.png" alt="Code Room Logo" />
                     <h1 className="text-3xl font-bold tracking-tight text-white">Code Room</h1>
                     <p className="text-slate-400">Real-time collaborative code editor</p>
                 </div>
