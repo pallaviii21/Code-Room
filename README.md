@@ -1,64 +1,176 @@
-# Code Room
+# ⚡ Code Room — Real-Time Collaborative Cloud IDE
 
-A real-time collaborative code editor platform empowering users to write, chat, and execute code together over the web effortlessly. Code Room supports active persistent sessions and native compilation for multiple popular languages directly within the browser dashboard.
+<div align="center">
 
-![Code Room Demo](client/public/codeRoom-Photoroom.png)
+![Code Room Banner](client/public/codeRoom-Photoroom.png)
 
-## Highlights & Features
-- ⚡ **Real-time Synchronization**: Powered by Socket.io, code editing occurs perfectly in-sync across all participants.
-- 💻 **Live Compilation & Execution**: In-house support for compiling and testing algorithms in **JavaScript**, **Python**, **C++**, and **Java** simultaneously.
-- 💬 **Live Room Chat**: Integrated chat dashboards allowing users to communicate without leaving the programming workflow.
-- 🔒 **Persistent Code Storage**: Rooms and live code payloads are safely vaulted into MongoDB so users rejoining or entering late access code seamlessly. 
-- 🎨 **Sleek UI/UX**: Utilizing TailwindCSS, the IDE mimics modern dark-mode VS Code themes with syntax highlighting driven identically by the underlying structural Monaco Editor engine.
+**A high-performance, real-time collaborative code editor platform empowering developers, teams, and students to write, chat, and compile multi-language code together seamlessly in the browser.**
 
-## Technology Stack
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.2-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Socket.io](https://img.shields.io/badge/Socket.io-4.8-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://socket.io/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 
-### Frontend
-- **Framework**: React / Vite
-- **Styling**: Tailwind CSS
-- **Code Editor**: Monaco Editor (VS Code core engine)
-
-### Backend
-- **Server**: Node.js / Express
-- **Real-time Interface**: Socket.io
-- **Database**: MongoDB (Mongoose)
+</div>
 
 ---
 
-## Local Development Workflow
+## 🌟 Highlights & Features
 
-Code-Room is structured as a fullstack application, cleanly decoupled into independent `client` and `server` modules.
+### 🚀 Stunning Developer-First Landing Page
+- **Interactive Hero Showcase**: Live simulated Monaco editor mockup with active typing, syntax coloring, floating room chat preview, and simulated test runner.
+- **Instant 1-Click Room Generator**: Generate unique UUID rooms and jump straight into coding without registration friction.
+- **Interactive Multi-Language Sandbox**: Test-drive algorithm compilation live in the browser for JavaScript, Python, C++, and Java before joining a room.
+- **Bento Feature Grid**: Highlights key technical capabilities with sleek glassmorphism and glowing dark-mode aesthetics.
+- **Minimalist Custom Mouse Pointer**: Hardware-accelerated floating cursor tip with smooth trailing halo aura and interactive element hover expansion.
+
+### ⚡ Real-Time Multi-User Collaboration
+- **Zero-Latency Synchronization**: High-throughput Socket.io pipelines ensuring keystrokes, syntax edits, and code formatting stream across all connected peers in sub-10ms.
+- **Monaco Editor Core Engine**: Powered by the Microsoft Monaco Editor (VS Code core) featuring intelligent autocomplete, bracket colorization, multi-cursor editing, and standard IDE shortcuts.
+
+### 💻 Multi-Language Cloud Execution & Compilation
+- In-browser code compilation and standard output/error telemetry for:
+  - 🟨 **JavaScript** (Node.js ES6+)
+  - 🟦 **Python** (Python 3.10)
+  - 🔷 **C++** (GCC 12)
+  - 🟧 **Java** (OpenJDK 17)
+
+### 💬 Integrated In-Room Chat & Presence
+- Built-in real-time team chat channel with timestamps, user color badges, and system toast alerts when collaborators join or leave.
+
+### 🔒 Persistent Room Storage
+- Sessions and latest code buffers are safely vaulted into MongoDB so users rejoining or entering late access the latest synchronized workspace.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 19, Vite, Tailwind CSS v4, Monaco Editor (`@monaco-editor/react`), React Router v7, Lucide Icons, React Hot Toast |
+| **Backend** | Node.js, Express, Socket.io |
+| **Database** | MongoDB, Mongoose |
+| **Code Runner** | Piston Cloud API / Native Compiler Sandbox |
+
+---
+
+## 📁 Repository Structure
+
+```text
+Code-Room/
+├── client/                     # Frontend Application (React + Vite + Tailwind CSS)
+│   ├── public/                 # Static assets & logos
+│   ├── src/
+│   │   ├── api/                # Code execution API clients (Piston)
+│   │   ├── components/         # Modular UI Components
+│   │   │   ├── Navbar.jsx              # Sticky glassmorphism header
+│   │   │   ├── HeroSection.jsx         # Hero banner & instant room launcher
+│   │   │   ├── FeaturesBento.jsx       # Bento grid feature cards
+│   │   │   ├── InteractivePlayground.jsx# In-browser test runner sandbox
+│   │   │   ├── HowItWorks.jsx          # 3-step progression guide
+│   │   │   ├── FAQ.jsx                 # Expandable accordion
+│   │   │   ├── CallToAction.jsx        # Bottom quick launcher banner
+│   │   │   ├── CustomMousePointer.jsx  # Floating cursor follower
+│   │   │   └── Footer.jsx              # Tech stack & branding footer
+│   │   ├── pages/
+│   │   │   ├── Home.jsx                # Full interactive landing page
+│   │   │   └── EditorPage.jsx          # Live collaborative IDE & chat dashboard
+│   │   ├── socket.js           # Socket.io client initialization
+│   │   ├── App.jsx             # React routing setup
+│   │   └── index.css           # Tailwind CSS & global design tokens
+│   └── package.json
+├── server/                     # Backend Application (Node.js + Express + Socket.io)
+│   ├── models/                 # Mongoose schemas (Room data persistence)
+│   ├── index.js                # Server entry point & Socket event handlers
+│   └── package.json
+└── README.md
+```
+
+---
+
+## 🚀 Local Development Quickstart
 
 ### Prerequisites
-- Node.js (v18+)
-- Local or Atlas MongoDB URI
-- Global C++/Java compilers and Python (If local code execution is utilized) Let `g++`, `javac`, and `python` exist in your path.
+- [Node.js](https://nodejs.org/) (v18.x or later)
+- [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas cluster URI)
+- Git
 
-### Backend Setup
-1. Navigate to the server folder: `cd server`
-2. Install dependencies: `npm install`
-3. Prepare environment variables: Duplicate a `.env` file at the `server/` level featuring:
+---
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/pallaviii21/Code-Room.git
+cd Code-Room
+```
+
+---
+
+### 2. Backend Setup
+1. Navigate into the `server` directory:
+   ```bash
+   cd server
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in `server/`:
    ```env
    PORT=5000
    MONGO_URI=your_mongodb_cluster_url
    FRONTEND_URL=http://localhost:5174
    ```
-4. Start the server: `npm run dev`
-
-### Frontend Setup
-1. Open a new terminal and navigate to the client folder: `cd client`
-2. Install dependencies: `npm install`
-3. Configure dynamic environment parameters inside `.env.local` inside `client/`:
-   ```env
-   VITE_BACKEND_URL=http://localhost:5000
+4. Start the backend development server:
+   ```bash
+   npm run dev
    ```
-4. Start the Vite development interface: `npm run dev`
 
 ---
 
-## Deployment Strategy
+### 3. Frontend Setup
+1. Open a new terminal and navigate to `client`:
+   ```bash
+   cd client
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env.local` file in `client/`:
+   ```env
+   VITE_BACKEND_URL=http://localhost:5000
+   ```
+4. Launch the Vite dev server:
+   ```bash
+   npm run dev
+   ```
+5. Open your browser and navigate to `http://localhost:5174/`.
 
-This repository was designed specifically avoiding hard-linked environments so that decoupling allows maximum flexibility for robust serverless setups.
+---
 
-1. **Frontend**: Geared flawlessly to execute `npm run build` on **Vercel**. Lock `VITE_BACKEND_URL` to your production host to ensure all routing automatically shifts.
-2. **Backend**: Structurally arranged for zero-friction runtime on **Render**. Utilize standard HTTP builds relying natively on `npm start` while declaring the production `FRONTEND_URL` inside your Render dashboard's env-wizard to tightly lock all web-tier CORS parameters safely.
+## 🌐 Deployment
+
+### Frontend (Vercel)
+1. Import the repository into [Vercel](https://vercel.com).
+2. Set the **Root Directory** to `client`.
+3. Set the Environment Variable:
+   - `VITE_BACKEND_URL` = `https://your-backend-service.onrender.com`
+4. Deploy!
+
+### Backend (Render)
+1. Create a new **Web Service** on [Render](https://render.com).
+2. Set the **Root Directory** to `server`.
+3. Set the **Build Command** to `npm install` and **Start Command** to `npm start`.
+4. Configure Environment Variables:
+   - `PORT` = `5000`
+   - `MONGO_URI` = `your_mongodb_atlas_connection_string`
+   - `FRONTEND_URL` = `https://your-frontend.vercel.app`
+5. Deploy!
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
