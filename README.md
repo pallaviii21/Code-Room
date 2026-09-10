@@ -2,7 +2,8 @@
 
 <div align="center">
 
-![Code Room Banner](client/public/codeRoom-Photoroom.png)
+<img src="client/public/codeRoom-Photoroom.png" alt="Code Room Banner" width="300">
+
 
 **A high-performance, real-time collaborative cloud IDE with built-in Google Gemini AI pair programming, 1-click automated error debugging, live multi-user synchronization, and instant multi-language code compilation in the browser.**
 
