@@ -1,4 +1,4 @@
-# ⚡ Code Room — AI-Powered Real-Time Collaborative Cloud IDE
+# Code Room — AI-Powered Real-Time Collaborative Cloud IDE
 
 <div align="center">
 
@@ -22,10 +22,10 @@
 ## 🌟 Highlights & Key Features
 
 ### 🤖 Built-In AI Pair Programmer & Automated Debugger *(New in v1.1.0)*
-- **🛠️ 1-Click Terminal Error Diagnoser & Auto-Fixer**: When compiler errors, syntax exceptions, or runtime crashes occur, the **"Auto-Fix with AI"** button instantly diagnoses root causes using **Google Gemini 2.5 Flash** and patches the Monaco Editor buffer in 1 click across all connected collaborators.
-- **👥 In-Room Collaborative `@ai` Teammate**: Mention `@ai` or `/ai` directly in room chat. The AI assistant inspects the live editor buffer in real-time, explains complex logic, suggests Big-O optimizations, and produces test cases visible to the entire room simultaneously.
-- **⚡ Quick Prompt Suggestions**: Instant action chips (`@ai explain`, `@ai optimize`, `@ai write tests`, `@ai find bugs`) to accelerate group pair programming and technical interview prep.
-- **🆓 100% Free AI Tier**: Uses Google's free-tier Gemini API (no credit card required) with graceful fallbacks so the workspace never fails.
+- **1-Click Terminal Error Diagnoser & Auto-Fixer**: When compiler errors, syntax exceptions, or runtime crashes occur, the **"Auto-Fix with AI"** button instantly diagnoses root causes using **Google Gemini 2.5 Flash** and patches the Monaco Editor buffer in 1 click across all connected collaborators.
+- **In-Room Collaborative `@ai` Teammate**: Mention `@ai` or `/ai` directly in room chat. The AI assistant inspects the live editor buffer in real-time, explains complex logic, suggests Big-O optimizations, and produces test cases visible to the entire room simultaneously.
+- **Quick Prompt Suggestions**: Instant action chips (`@ai explain`, `@ai optimize`, `@ai write tests`, `@ai find bugs`) to accelerate group pair programming and technical interview prep.
+- **100% Free AI Tier**: Uses Google's free-tier Gemini API (no credit card required) with graceful fallbacks so the workspace never fails.
 
 ### 🌗 Dynamic Light Mode & Dark Mode Workspace *(New in v1.1.0)*
 - **1-Click Theme Switcher**: Toggle smoothly between deep dark mode and clean, high-contrast light mode directly from the top navigation bar.
@@ -44,11 +44,11 @@
 
 ### 💻 Multi-Language Cloud Execution & Compilation
 - In-browser code compilation and standard output/error telemetry for:
-  - 🟨 **JavaScript** (Node.js ES6+)
-  - 🟦 **Python** (Python 3.10)
-  - 🔷 **C++** (GCC 12)
-  - 🟧 **Java** (OpenJDK 17)
-  - 🌐 **TypeScript**, **Rust**, **Go**
+  - **JavaScript** (Node.js ES6+)
+  - **Python** (Python 3.10)
+  - **C++** (GCC 12)
+  - **Java** (OpenJDK 17)
+  - **TypeScript**, **Rust**, **Go**
 
 ### 💬 Integrated In-Room Chat & Presence
 - Built-in real-time team chat channel with timestamps, user color badges, and system toast alerts when collaborators join or leave.
