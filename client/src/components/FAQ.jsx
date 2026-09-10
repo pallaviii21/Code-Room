@@ -21,6 +21,10 @@ const FAQS = [
   {
     question: 'Can multiple people type at the same exact time?',
     answer: 'Absolutely. Code Room is powered by low-latency Socket.io synchronization channels. Keystrokes, code formatting, and cursor changes stream across all participants in under 10 milliseconds.'
+  },
+  {
+    question: 'How do the AI debugging and @ai features work? Is it free?',
+    answer: 'Yes! Code Room is powered by the Google Gemini API, which offers a generous 100% free tier (no credit card required). When execution fails, click "Explain & Fix with AI" in the terminal to inspect root causes and apply a 1-click patch. In the room chat, simply tag @ai to ask questions, optimize algorithms, or generate test cases together.'
   }
 ];
 

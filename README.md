@@ -40,6 +40,12 @@
 ### 💬 Integrated In-Room Chat & Presence
 - Built-in real-time team chat channel with timestamps, user color badges, and system toast alerts when collaborators join or leave.
 
+### ✨ AI Error Diagnoser & 1-Click Auto-Fixer
+- Integrated with Google Gemini AI to analyze terminal errors (`stderr`), diagnose root causes, and patch the Monaco Editor directly across all connected collaborators.
+
+### 🤖 Room-Wide Collaborative `@ai` Teammate
+- Mention `@ai` or `/ai` right inside room chat. The AI understands the room's live editor buffer, generates explanations, optimizes algorithms, and shares answers with everyone in the room simultaneously.
+
 ### 🔒 Persistent Room Storage
 - Sessions and latest code buffers are safely vaulted into MongoDB so users rejoining or entering late access the latest synchronized workspace.
 
@@ -52,6 +58,7 @@
 | **Frontend** | React 19, Vite, Tailwind CSS v4, Monaco Editor (`@monaco-editor/react`), React Router v7, Lucide Icons, React Hot Toast |
 | **Backend** | Node.js, Express, Socket.io |
 | **Database** | MongoDB, Mongoose |
+| **AI Engine** | Google Gemini 1.5/2.5 Flash (`@google/generative-ai`) |
 | **Code Runner** | Piston Cloud API / Native Compiler Sandbox |
 
 ---
@@ -121,6 +128,7 @@ cd Code-Room
    PORT=5000
    MONGO_URI=your_mongodb_cluster_url
    FRONTEND_URL=http://localhost:5174
+   GEMINI_API_KEY=your_free_gemini_api_key   # Get free at https://aistudio.google.com/app/apikey
    ```
 4. Start the backend development server:
    ```bash

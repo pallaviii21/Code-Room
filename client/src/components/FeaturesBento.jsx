@@ -140,6 +140,37 @@ export const FeaturesBento = () => {
             </p>
           </div>
 
+          {/* Card 6: AI Auto-Fixer & Collaborative Assistant (12 cols full width spotlight) */}
+          <div className="lg:col-span-12 glass-panel p-6 sm:p-8 rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/20 via-slate-900/60 to-indigo-950/20 hover:border-purple-500/60 transition-all duration-300 relative overflow-hidden group">
+            <div className="absolute -top-10 -right-10 w-60 h-60 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-xs font-semibold text-purple-300">
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                  <span>Powered by Google Gemini AI</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+                  Intelligent Error Auto-Fixer & Collaborative <span className="text-purple-400">@ai</span> Teammate
+                </h3>
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                  Hit a runtime exception or compiler syntax error? Click <strong className="text-purple-300">Explain & Fix with AI</strong> to diagnose root causes and patch the Monaco editor in 1-click. In the chat, simply tag <code className="bg-purple-950/80 px-2 py-0.5 rounded text-purple-300 border border-purple-800/60">@ai</code> to explain algorithms, suggest optimizations, or generate unit tests for your entire team simultaneously.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 md:self-center flex-shrink-0">
+                <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-purple-500/30 text-xs font-mono text-purple-300 flex items-center gap-2.5 shadow-inner">
+                  <Cpu className="w-4 h-4 text-purple-400" />
+                  <span>1-Click Terminal Patch</span>
+                </div>
+                <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-indigo-500/30 text-xs font-mono text-indigo-300 flex items-center gap-2.5 shadow-inner">
+                  <Users className="w-4 h-4 text-indigo-400" />
+                  <span>Shared In-Room Context</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>

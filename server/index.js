@@ -10,6 +10,8 @@ const connectDB = require('./config/db');
 const Room = require('./models/Room');
 const CodeSnapshot = require('./models/CodeSnapshot');
 
+const { explainAndFixError, generateChatResponse } = require('./services/aiService');
+
 // Connect to MongoDB
 connectDB();
 
@@ -19,7 +21,28 @@ app.use(cors({
     origin: allowedOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+
+// AI Fix Error Endpoint
+app.post('/api/ai/fix-error', async (req, res) => {
+    try {
+        const { language, code, error } = req.body;
+        if (!code && !error) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Code and error are required.' 
+            });
+        }
+        const result = await explainAndFixError({ language, code, error });
+        res.json(result);
+    } catch (err) {
+        console.error('Error in /api/ai/fix-error:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: err.message || 'Internal server error processing AI fix.' 
+        });
+    }
+});
 
 app.post('/api/execute', (req, res) => {
     const { language, files } = req.body;
@@ -151,9 +174,13 @@ io.on('connection', (socket) => {
     });
 
     // Listen for code changes
-    socket.on('code_change', async ({ roomId, code }) => {
+    socket.on('code_change', async ({ roomId, code, language }) => {
         // Save the latest code in memory
-        roomState.set(roomId, { code });
+        const existing = roomState.get(roomId) || {};
+        roomState.set(roomId, { 
+            code, 
+            language: language || existing.language || 'javascript' 
+        });
         // Broadcast to all other clients in the exact room
         socket.to(roomId).emit('code_change', { code });
 
@@ -169,16 +196,79 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Listen for language changes
+    socket.on('language_change', ({ roomId, language }) => {
+        const existing = roomState.get(roomId) || {};
+        roomState.set(roomId, { ...existing, language });
+        socket.to(roomId).emit('language_change', { language });
+    });
+
     // Listen for chat messages
-    socket.on('send_message', ({ roomId, message, username }) => {
+    socket.on('send_message', async ({ roomId, message, username }) => {
         const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        // Broadcast the message to all clients in the room (including sender if we want, or use io.to to include everyone)
+        const messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+
+        // Broadcast the message to all clients in the room
         io.to(roomId).emit('receive_message', { 
+            id: messageId,
             message, 
             username, 
             timestamp,
             socketId: socket.id
         });
+
+        // Check if message invokes the AI assistant
+        const isAiPrompt = /(@ai|\/ai)/i.test(message);
+        if (isAiPrompt) {
+            const aiMessageId = 'ai_' + Date.now();
+            const aiTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Broadcast initial thinking indicator to all peers
+            io.to(roomId).emit('receive_message', {
+                id: aiMessageId,
+                message: 'Thinking...',
+                username: 'CodeBot (AI)',
+                timestamp: aiTimestamp,
+                socketId: 'ai-bot',
+                isAi: true,
+                isThinking: true
+            });
+
+            // Extract prompt without @ai or /ai prefix
+            const cleanPrompt = message.replace(/(@ai|\/ai)/gi, '').trim() || 'How can you help with this code?';
+            const roomContext = roomState.get(roomId) || {};
+
+            try {
+                const aiResponse = await generateChatResponse({
+                    prompt: cleanPrompt,
+                    code: roomContext.code || '',
+                    language: roomContext.language || 'javascript',
+                    username
+                });
+
+                // Update the thinking message with final answer
+                io.to(roomId).emit('ai_message_update', {
+                    id: aiMessageId,
+                    message: aiResponse,
+                    username: 'CodeBot (AI)',
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    socketId: 'ai-bot',
+                    isAi: true,
+                    isThinking: false
+                });
+            } catch (err) {
+                console.error('Failed to handle @ai chat prompt:', err);
+                io.to(roomId).emit('ai_message_update', {
+                    id: aiMessageId,
+                    message: '⚠️ CodeBot was unable to process your request. Please check server logs.',
+                    username: 'CodeBot (AI)',
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    socketId: 'ai-bot',
+                    isAi: true,
+                    isThinking: false
+                });
+            }
+        }
     });
 
     socket.on('disconnecting', () => {
